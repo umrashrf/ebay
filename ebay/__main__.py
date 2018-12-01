@@ -27,8 +27,15 @@ ORDERS_RESPONSE = API.execute('GetOrders', {'RuName': settings.EBAY_RU_NAME,
 ORDER_FILENAME = os.path.join(settings.ORDERS_DIR, f'orders_{TODAY_NAME}.json')
 ORDER_JSON = json.dumps(ORDERS_RESPONSE, sort_keys=True, indent=4)
 
-S3 = boto3.resource("s3")
-S3_BUCKET = S3.Bucket(settings.S3_BUCKET_ORDERS)
-S3_BUCKET.put_object(Key=ORDER_FILENAME, Body=ORDER_JSON)
+try:
+    HAS_ORDERS = len(ORDERS_RESPONSE['OrderArray']['Order']) > 0
+except KeyError as err:
+    HAS_ORDERS = False
+    logging.error('No orders found')
+
+if HAS_ORDERS:
+    S3 = boto3.resource("s3")
+    S3_BUCKET = S3.Bucket(settings.S3_BUCKET_ORDERS)
+    S3_BUCKET.put_object(Key=ORDER_FILENAME, Body=ORDER_JSON)
 
 logging.debug(ORDER_JSON)
