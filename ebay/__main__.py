@@ -28,7 +28,7 @@ ORDER_FILENAME = os.path.join(settings.ORDERS_DIR, f'orders_{TODAY_NAME}.json')
 
 try:
     HAS_ORDERS = len(ORDERS_RESPONSE['OrderArray']['Order']) > 0
-except KeyError as err:
+except (KeyError, TypeError) as err:
     HAS_ORDERS = False
     logging.error('No orders found')
 
