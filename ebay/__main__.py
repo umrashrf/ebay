@@ -48,10 +48,15 @@ if STATUS_RESPONSE['TokenStatus']['Status'] != 'Active':
         fp.write(AUTH_TOKEN)
     logging.info('Success!')
 
+TODAY = datetime.datetime.now()
+TODAY_NAME = TODAY.strftime('%y_%m_%dT%H_%M_%S')
+
 ORDERS_RESPONSE = API.execute('GetOrders', {'RuName': settings.EBAY_RU_NAME,
-                                            'CreateTimeFrom': datetime.datetime.now()-timedelta(days=60),
-                                            'CreateTimeTo': datetime.datetime.now()})
-print(ORDERS_RESPONSE)
-ORDER_FILENAME = os.path.join(settings.ORDERS_DIR, 'orders.json')
+                                            'CreateTimeFrom': TODAY,
+                                            'CreateTimeTo': TODAY})
+
+ORDER_FILENAME = os.path.join(settings.ORDERS_DIR, f'orders_{TODAY_NAME}.json')
 with open(ORDER_FILENAME, 'w') as fp:
     json.dump(ORDERS_RESPONSE, fp, sort_keys=True, indent=4)
+
+print(ORDERS_RESPONSE)
