@@ -24,9 +24,6 @@ ORDERS_RESPONSE = API.execute('GetOrders', {'RuName': settings.EBAY_RU_NAME,
                                             'CreateTimeFrom': TODAY,
                                             'CreateTimeTo': TODAY})
 
-if not ORDERS_RESPONSE:
-    ORDERS_RESPONSE = {}
-
 ORDER_FILENAME = os.path.join(settings.ORDERS_DIR, f'orders_{TODAY_NAME}.json')
 ORDER_JSON = json.dumps(ORDERS_RESPONSE, sort_keys=True, indent=4)
 
