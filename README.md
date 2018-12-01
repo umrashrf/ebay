@@ -2,9 +2,10 @@
 
 Use this API to fetch orders from ebay seller central
 
+## Install
+
 ```
-$> git clone https://github.com/umrashrf/ebay.git
-$> cd ebay/
+$> pip install https://github.com/umrashrf/ebay/archive/master.zip
 ```
 
 ## Get Token
