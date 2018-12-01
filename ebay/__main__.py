@@ -52,5 +52,6 @@ ORDERS_RESPONSE = API.execute('GetOrders', {'RuName': settings.EBAY_RU_NAME,
                                             'CreateTimeFrom': datetime.datetime.now()-timedelta(days=60),
                                             'CreateTimeTo': datetime.datetime.now()})
 print(ORDERS_RESPONSE)
-with open('orders.json', 'w') as fp:
+ORDER_FILENAME = os.path.join(settings.ORDERS_DIR, 'orders.json')
+with open(ORDER_FILENAME, 'w') as fp:
     json.dump(ORDERS_RESPONSE, fp, sort_keys=True, indent=4)
