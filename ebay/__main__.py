@@ -39,4 +39,4 @@ if HAS_ORDERS:
     S3_BUCKET = S3.Bucket(settings.S3_BUCKET_ORDERS)
     S3_BUCKET.put_object(Key=ORDER_FILENAME, Body=ORDER_JSON)
 
-logging.debug(ORDER_JSON)
+logging.debug(ORDERS_RESPONSE)
