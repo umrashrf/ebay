@@ -6,9 +6,14 @@ Used by OrdersAPI
 
 from __future__ import unicode_literals
 
+import os
+import sys
 import logging
-import xmltodict
+
+from urllib.parse import urljoin
+
 import requests
+import xmltodict
 
 from . import settings
 from .common import _get_data_from_response
@@ -61,7 +66,7 @@ class TradingAPI:
         """
         main function of this module
         """
-        logging.info(f'Executing {call}')
+        logging.info('Executing %s', call)
         headers = self._get_headers(call)
         data = self._get_xml_request(
             call, kw_dict, include_requester_credentials)
@@ -74,3 +79,42 @@ class TradingAPI:
         Use this function to set previous token
         """
         self._token = token
+
+
+if __name__ == '__main__':
+    AUTH_TOKEN = os.getenv('EBAY_AUTH_TOKEN', None)
+
+    API = TradingAPI()
+    API.set_token(AUTH_TOKEN)
+
+    STATUS_RESPONSE = API.execute('GetTokenStatus', {'RuName': settings.EBAY_RU_NAME})
+
+    try:
+        HAS_TOKEN = STATUS_RESPONSE['TokenStatus']['Status'] != 'Active'
+    except KeyError as err:
+        HAS_TOKEN = False
+
+    if not HAS_TOKEN:
+        SESSION_RESPONSE = API.execute('GetSessionID', {'RuName': settings.EBAY_RU_NAME})
+        SESSION_ID = SESSION_RESPONSE['SessionID']
+
+        logging.info('Please go to this link and press Agree')
+        QUERY_STRING = '?SignIn&runame={}&SessID={}'.format(settings.EBAY_RU_NAME,
+                                                            SESSION_ID)
+        logging.info(urljoin(settings.EBAY_SIGNIN_ENDPOINT, QUERY_STRING))
+
+        input("Press any key to continue...")
+
+        TOKEN_RESPONSE = API.execute('FetchToken', {'RuName': settings.EBAY_RU_NAME,
+                                                    'SessionID': SESSION_ID})
+        try:
+            AUTH_TOKEN = TOKEN_RESPONSE['eBayAuthToken']
+            API.set_token(AUTH_TOKEN)
+
+        except KeyError as err:
+            AUTH_TOKEN = None
+            logging.info('Failure!')
+            sys.exit(0)
+
+    logging.info('AUTH TOKEN: %s', AUTH_TOKEN)
+    logging.info('Success!')
